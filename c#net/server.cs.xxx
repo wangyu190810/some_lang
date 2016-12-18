@@ -1,0 +1,92 @@
+public partial class server : Form
+     {
+          private IPEndPoint ServerInfo;//存放服务器的IP和端口信息
+          private Socket ServerSocket;//服务端运行的SOCKET
+          private Thread ServerThread;//服务端运行的线程
+          private Socket[] ClientSocket;//为客户端建立的SOCKET连接
+          private int ClientNumb;//存放客户端数量
+          private byte[] MsgBuffer;//存放消息数据
+           private object obj;
+11 
+12         public server()
+13         {
+14             InitializeComponent();
+15             ListenClient();
+16         }
+17 
+18         /// <summary>
+19         /// 开始服务，监听客户端
+20         /// </summary>
+21         private void ListenClient()
+22         {
+23             try
+24             {
+25                 ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+26                 IPAddress ip = IPAddress.Parse("127.0.0.1");
+27                 ServerInfo = new IPEndPoint(ip, Int32.Parse("3000"));
+28                 ServerSocket.Bind(ServerInfo);
+29                 ServerSocket.Listen(10);
+30 
+31                 ClientSocket = new Socket[65535];
+32                 MsgBuffer = new byte[65535];
+33                 ClientNumb = 0;
+34 
+35                 ServerThread = new Thread(new ThreadStart(RecieveAccept));
+36                 ServerThread.Start();
+37             }
+38             catch (System.Exception ex)
+39             {
+40 
+41             }
+42         }
+43 
+44         /// <summary>
+45         /// 添加阻塞，监听客户端
+46         /// </summary>
+47         private void RecieveAccept()
+48         {
+49             while (true)
+50             {
+51                 //等待接受客户端连接，如果有就执行下边代码，没有就阻塞
+52                 ClientSocket[ClientNumb] = ServerSocket.Accept();
+53                 //接受客户端信息，没有阻塞，则会执行下边输出的代码；如果是Receive则不会执行下边输出代码
+54                 ClientSocket[ClientNumb].BeginReceive(MsgBuffer, 0, MsgBuffer.Length, SocketFlags.None,
+55                     new AsyncCallback(ReceiveCallback), ClientSocket[ClientNumb]);
+56                 this.Invoke((MethodInvoker)delegate
+57                 {
+58                     lock (this.textBox1)
+59                         this.textBox1.Text += "客户端：" + ClientNumb.ToString() + "连接成功！" + "\r\n";
+60                 });
+61                 ClientNumb++;
+62             }
+63         }
+64 
+65         /// <summary>
+66         /// 回发数据到客户端
+67         /// </summary>
+68         /// <param name="ar"></param>
+69         private void ReceiveCallback(IAsyncResult ar)
+70         {
+71             try
+72             {
+73                 Socket rSocket = (Socket)ar.AsyncState;
+74                 int rEnd = rSocket.EndReceive(ar);
+75 
+76                 for (int i = 0; i < ClientNumb; i++)
+77                 {
+78                     if (ClientSocket[i].Connected)
+79                     {
+80                         //发送数据到客户端
+81                         ClientSocket[i].Send(MsgBuffer, 0, rEnd, SocketFlags.None);
+82                     }
+83 
+84                     //同时接受客户端回发的数据，用于回发
+85                     rSocket.BeginReceive(MsgBuffer, 0, MsgBuffer.Length, 0, new AsyncCallback(ReceiveCallback), rSocket);
+86                 }
+87             }
+88             catch (System.Exception ex)
+89             {
+90 
+91             }
+92         }
+93     }

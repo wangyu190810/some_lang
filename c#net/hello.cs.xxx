@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace HelloWorld
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // 第一个C#程序Hello World - 
+
+            // Console类位于System命名空间内，表示控制台应用程序的标准输入流、输出流
+            // 和错误流
+            // Console.WriteLine方法将指定的数据（后跟当前行终止符）写入标准输出流
+            // Console.ReadLine方法使程序暂停下来，直到按下回车键才会继续运行
+            Console.WriteLine("Hello World!");
+            Console.ReadLine();
+        }
+    }
+}
