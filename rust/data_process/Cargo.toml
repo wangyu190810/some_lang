@@ -1,0 +1,10 @@
+[package]
+name = "data_process"
+version = "0.1.0"
+authors = ["vagrant"]
+
+[dependencies]
+json="*"
+redis="*"
+serde = "0.8"
+serde_json = "0.8"
