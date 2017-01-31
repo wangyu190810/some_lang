@@ -272,21 +272,46 @@ impl Response{
     fn body(s: &str) -> String{
         format!("\r\n{}\r\n",s)
     }
+
+    fn html_body(body: &str) -> Response{
+        Self::with_head_body(Self::header(200, "text/html", body.chars().count()), body.to_string())
+    }
+
+    fn html_404_body() -> Response{
+        let body = "<html><head><title>404 Not Found</title></head><body>404 Not Found</body></html>";
+        Self::with_head_body(Self::header(404, "text/html", body.chars().count()), body.to_string())
+    }
+
+    fn html_500_body() -> Response{
+        let body = "<html><head><title>501 Not Implemented</title></head><body>501 Not Implemented</body></html>";
+        Self::with_head_body(Self::header(500, "text/html", body.chars().count()), body.to_string())
+    }
 }
 
 // 
 
-fn handle_client(mut stream: TcpStream) {
-    // pares(&mut stream);
-    if let Some(req) = Request::pares(&mut stream){
-        process(req)
-    }
-    let content = "hello worldasdfasdf";
-    
-    Response::new(200, "text/html",content.to_string()).send(&mut stream);
-   
+
+fn rule_data(roule: &str, req: Request) -> Response{
+    if let Some(req_str) = req.query{
+        let name =  req_str.get("name").unwrap();
+        let content = name.to_string();
+        Response::new(200, "text/html",content)
+    }else{
+
+        Response::html_404_body()
+    }    
 }
 
+fn rule_data_app(roule: &str, req: Request) -> Response{
+    if let Some(req_str) = req.query{
+        let name =  req_str.get("name").unwrap();
+        let content = name.to_string();
+        Response::new(200, "text/html",content)
+    }else{
+        Response::html_500_body()
+    }
+
+}
 
 
 // fn process(stream: TcpStream, req: Request){
@@ -303,36 +328,67 @@ fn process(req: Request){
     }
 }
 
-
-fn server(){
-    let listener = TcpListener::bind("0.0.0.0:5000").unwrap();
-    // let rock: Arc<Rock> = Arc::new(self);
-    // accept connections and process them, spawning a new thread for each one
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
-                handle_client(stream);
-                
-                // stream.close();
-            }
-            Err(e) => { 
-                print!("asdfasdf{:}", e);
-                /* connection failed */ }
-        }
-    }
-    drop(listener);
+struct Server{
+    host:String,
+    port:usize,
+    static_path:String
 }
 
-fn client(){
-   let mut stream = TcpStream::connect("127.0.0.1:34254").unwrap();
+impl Server{
 
-    // ignore the Result
-    let _ = stream.write(&[1]);
-    let _ = stream.read(&mut [0; 128]); // ignore here too
-} 
+    fn new(host: &str, port: usize, static_path:&str ) -> Server{
+        Server{
+            host:host.to_string(),
+            port:port,
+            static_path: static_path.to_string()
+        }
+    }
 
+    fn run(&self){
+        // let addr = format!("{}:{}", self.host, self.port).as_str();
+
+        let listener = TcpListener::bind(format!("{}:{}",self.host,self.port).as_str()).unwrap();
+        // let listener = TcpListener::bind(&addr).unwrap();
+        // let rock: Arc<Rock> = Arc::new(self);
+        // accept connections and process them, spawning a new thread for each one
+        for stream in listener.incoming() {
+            match stream {
+                Ok(stream) => {
+                    Self::handle_client(stream);
+                }
+                Err(e) => { 
+                    print!("asdfasdf{:}", e);
+                    /* connection failed */ }
+            }
+        }
+        drop(listener);
+    }
+
+    fn start(&self){
+        Self::run(self);
+    }
+
+    fn handle_client(mut stream: TcpStream) {
+    // pares(&mut stream);
+    // let mut rule_url = Vec::new(u8);
+        if let Some(req) = Request::pares(&mut stream){
+            if req.path == "/"{
+                let resp = rule_data("/", req);
+                resp.send(&mut stream);
+            }else if req.path == "/index"{
+                let resp = rule_data_app("/index", req);
+                resp.send(&mut stream);       
+            }else{
+                let content = "404";
+                let resp = Response::new(404,"text/html",content.to_string());
+                resp.send(&mut stream);
+            }
+        }   
+    }
+}
 
 
 fn main(){
-    server();
+    let  server = Server::new("0.0.0.0",5000,".");
+    server.start();
 }
