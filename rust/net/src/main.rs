@@ -1,7 +1,9 @@
 mod query;
 use query::{Server,Request,Response};
 use std::net::{TcpListener, TcpStream};
-
+use std::path::{PathBuf,Path};
+use std::fs::File;
+use std::io::*;
 
 fn rule_data(roule: &str, req: Request) -> Response{
     if let Some(req_str) = req.query{
@@ -25,14 +27,60 @@ fn rule_data_app(roule: &str, req: Request) -> Response{
 
 }
 
+ pub fn static_response(static_path: &String ,path: &String) -> Response{
+        // 静态文件解析和返回
+        // let mut buf = PathBuf::from(static_path);
+        // buf.push(path);
+        let mut buf = Path::new(static_path).to_path_buf();
+        let p = match path.chars().count() {
+            1 => "index.html".to_string(),
+            _ => path.chars().skip(1).collect(),
+        };
+        buf.push(p);
+        match buf.as_path().to_str(){
+            
+            Some(path) => {
+                println!("path is {},",path);
+                match File::open(path){
+                    Ok(mut file ) =>{
+                        let mut body = String::new();
+                        file.read_to_string(&mut body).unwrap();
+                        Response::new(200, "text/html",body)
+                    
+                    },
+                    Err(mut err) => {
+                        println!("path is {},{:?}",path,err);
+                        Response::html_404_body()
+                    }
+                
+                    
+                }
+            },
+            None =>{
+                Response::html_404_body()
+            }
+        }
+    }
+
+
 impl Server {
 
-    pub fn handle_client(mut stream: TcpStream) {
+    pub fn handle_client(&self, mut stream: TcpStream) {
     // pares(&mut stream);
     // let mut rule_url = Vec::new(u8);
         // let resp: Response;
+        
         if let Some(req) = Request::pares(&mut stream){
-            if req.path == "/"{
+            // let mut static_path_clone = self.static_path.clone();
+            // let mut req_path_clone = req.path.clone();
+            if req.path.ends_with(".html") || req.path.ends_with(".js"){
+               
+                // let resp = static_response(static_path_clone,req_path_clone);
+                let resp = static_response(&self.static_path,&req.path);
+                println!("static file{}", req.path);
+                resp.send(&mut stream);
+            }
+            else if req.path == "/"{
                 let resp =rule_data("/", req);
                 resp.send(&mut stream);
             }else if req.path == "/index"{
@@ -54,6 +102,7 @@ impl Server {
 }
 
 fn main(){
-    let  server = Server::new("0.0.0.0",5000,".");
+    // let  server = Server::new("0.0.0.0",5000,"/home/too/work/some_lang/rust/net/src/static/");
+    let  server = Server::new("0.0.0.0",5000,"./src/static/");
     server.start();
 }

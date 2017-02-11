@@ -1,6 +1,8 @@
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::collections::HashMap;
+use std::path::PathBuf;
+use std::fs::File;
 // use std::fmt::Debug::fmt;
 
 macro_rules! get {
@@ -291,7 +293,7 @@ fn process(req: Request){
 pub struct Server{
     host:String,
     port:usize,
-    static_path:String
+    pub static_path:String
 }
 
 impl Server{
@@ -314,7 +316,7 @@ impl Server{
         for stream in listener.incoming() {
             match stream {
                 Ok(stream) => {
-                    Self::handle_client(stream);
+                    Self::handle_client(&self,stream);
                 
                 }
                 Err(e) => { 
@@ -325,7 +327,9 @@ impl Server{
         drop(listener);
     }
 
-   pub fn start(&self){
+   
+
+    pub fn start(&self){
         Self::run(self);
     }
 
