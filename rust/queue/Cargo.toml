@@ -1,0 +1,13 @@
+[package]
+name = "queue"
+version = "0.1.0"
+authors = ["vagrant"]
+
+[dependencies]
+tarpc = { git = "https://github.com/google/tarpc" }
+tarpc-plugins = { git = "https://github.com/google/tarpc" }
+futures = "0.1"
+tokio-io = "0.1"
+tokio-proto = "0.1"
+tokio-service = "0.1"
+tokio-core = "0.1.6"

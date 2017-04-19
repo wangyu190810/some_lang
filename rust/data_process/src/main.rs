@@ -44,7 +44,6 @@ fn data () -> json::JsonValue{
    }
 
 
-
 fn main(){
     
     let parsed = json::parse(r#"
