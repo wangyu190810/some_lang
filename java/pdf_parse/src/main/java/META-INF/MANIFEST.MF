@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: lib\pdfbox-2.0.4.jar lib\fontbox-2.0.4.jar lib\commons-log
+ ging-1.2.jar
+Main-Class: PdfRead
+
