@@ -1,6 +1,8 @@
 use std::io;
 use std::str;
-use bytes::{BytesMut, BufMut};
+use bytes::{BytesMut, BufMut,IntoBuf,Buf};
+use bytes::buf::FromBuf;
+// use bytes::buf::FromBuf::from_buf;
 use tokio_io::codec::{Encoder, Decoder};
 use futures::{future, Future, BoxFuture};
 use tokio_proto::TcpServer;
@@ -9,14 +11,51 @@ use tokio_io::{AsyncRead, AsyncWrite};
 use tokio_io::codec::Framed;
 use tokio_proto::pipeline::ServerProto;
 
+use std::collections::HashMap;
+
+
+
 pub struct LineCodec;
+  
+
+impl LineCodec {
+    // parse websocket proto
+
+
+    fn parse_headers(msg : String) -> String{
+        
+        let mut headers: HashMap<String, String> = HashMap::new();
+        let mut it = msg.split("\r\n");
+        while let Some(kv) = it.next(){
+            let mut it = kv.split(":");
+            if let Some(k) = it.next(){
+                 if let Some(v) = it.next() {
+                    headers.insert(k.to_string(), v.to_string());
+                }
+            }
+        }
+        let mut handshake = String::from("\
+HTTP/1.1 101 Web Socket Protocol Handshake\r\n\
+Upgrade: webSocket\r\n\
+Connection: Upgrade\r\n\
+Sec-WebSocket-Accept:{:}\r\n\
+Sec-WebSocket-Origin: {:}\r\n\
+Sec-WebSocket-Location: {:}\r\n\r\n\
+");
+        // let head_str = format!(handshake,headers.get("Origin").unwrap(), headers.get("token").unwrap(),headers.get("Location").unwrap());
+        // return head_str;
+        return handshake;
+    }
+}
+
+
 
 impl Decoder for LineCodec {
     type Item = String;
     type Error = io::Error;
 
-    fn decode(&mut self, buf: &mut BytesMut) -> io::Result<Option<String>> {
-        if let Some(i) = buf.iter().position(|&b| b == b'\n') {
+    fn decode(&mut self, buf: &mut IntoBuf) -> io::Result<Option<String>> {
+        if let Some(i) = Vec::from_buf(buf) {
             // remove the serialized frame from the buffer.
             let line = buf.split_to(i);
 
@@ -41,8 +80,7 @@ impl Encoder for LineCodec {
     type Error = io::Error;
 
     fn encode(&mut self, msg: String, buf: &mut BytesMut) -> io::Result<()> {
-        buf.extend(msg.as_bytes());
-        buf.extend(b"\n");
+         buf.extend(Self.parse_headers(msg).as_bytes());
         Ok(())
     }
 }

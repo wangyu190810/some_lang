@@ -5,9 +5,7 @@ use futures::Future;
 use tarpc::future::{client, server};
 use tarpc::future::client::ClientExt;
 use tarpc::util::{FirstSocketAddr, Never};
-use tarpc::native_tls::{TlsAcceptor, Pkcs12};
 
-use tarpc::tls;
 
 use tarpc;
 use tokio_core::reactor;
@@ -79,42 +77,75 @@ use tokio_core::reactor;
 //     rpc hello(name: String) -> String;
 // }
 
-service! {
-    rpc hello(name: String) -> String;
-    rpc hello1(name: String) -> String;
-}
-
-
-
 // service! {
 //     rpc hello(name: String) -> String;
+//     rpc hello1(name: String) -> String;
 // }
+
+
+
+// // service! {
+// //     rpc hello(name: String) -> String;
+// // }
+
+// #[derive(Clone)]
+// struct HelloServer;
+
+// impl SyncService for HelloServer {
+//     fn hello(&self, name: String) -> Result<String, Never> {
+//         Ok(format!("Hello, {}!", name))
+//     }
+//     fn hello1(&self, name: String) -> Result<String, Never> {
+//         Ok(format!("Hello, {}!", name))
+//     }
+// }
+
+// fn get_acceptor() -> TlsAcceptor {
+//      let buf = include_bytes!("test/identity.p12");
+//      let pkcs12 = Pkcs12::from_der(buf, "password").unwrap();
+//      TlsAcceptor::builder(pkcs12).unwrap().build().unwrap()
+// }
+
+// fn main() {
+//     let addr = "localhost:10000";
+//     let acceptor = get_acceptor();
+//     let _server = HelloServer.listen(addr, server::Options::default().tls(acceptor));
+//     let client = SyncClient::connect(addr,
+//                                      client::Options::default()
+//                                          .tls(tls::client::Context::new("foobar.com").unwrap()))
+//                                          .unwrap();
+//     println!("{}", client.hello("Mom".to_string()).unwrap());
+// }
+
+
+
+
+service! {
+    rpc hello(name: String) -> String;
+}
 
 #[derive(Clone)]
 struct HelloServer;
 
-impl SyncService for HelloServer {
-    fn hello(&self, name: String) -> Result<String, Never> {
-        Ok(format!("Hello, {}!", name))
-    }
-    fn hello1(&self, name: String) -> Result<String, Never> {
+impl FutureService for HelloServer {
+    type HelloFut = Result<String, Never>;
+
+    fn hello(&self, name: String) -> Self::HelloFut {
         Ok(format!("Hello, {}!", name))
     }
 }
 
-fn get_acceptor() -> TlsAcceptor {
-     let buf = include_bytes!("test/identity.p12");
-     let pkcs12 = Pkcs12::from_der(buf, "password").unwrap();
-     TlsAcceptor::builder(pkcs12).unwrap().build().unwrap()
-}
-
-fn main() {
-    let addr = "localhost:10000";
-    let acceptor = get_acceptor();
-    let _server = HelloServer.listen(addr, server::Options::default().tls(acceptor));
-    let client = SyncClient::connect(addr,
-                                     client::Options::default()
-                                         .tls(tls::client::Context::new("foobar.com").unwrap()))
-                                         .unwrap();
-    println!("{}", client.hello("Mom".to_string()).unwrap());
+pub fn run() {
+    let mut reactor = reactor::Core::new().unwrap();
+    let (handle, server) = HelloServer.listen("localhost:10000".first_socket_addr(),
+                                  &reactor.handle(),
+                                  server::Options::default())
+                          .unwrap();
+    reactor.handle().spawn(server);
+    let options = client::Options::default().handle(reactor.handle());
+    reactor.run(FutureClient::connect(handle.addr(), options)
+            .map_err(tarpc::Error::from)
+            .and_then(|client| client.hello("Mom".to_string()))
+            .map(|resp| println!("{}", resp)))
+        .unwrap();
 }

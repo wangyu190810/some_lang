@@ -5,7 +5,7 @@ authors = ["vagrant"]
 
 [dependencies]
 tarpc = { git = "https://github.com/google/tarpc" }
-tarpc-plugins = { git = "https://github.com/google/tarpc" }
+tarpc-plugins = "0.1.1"
 futures = "0.1"
 tokio-io = "0.1"
 tokio-proto = "0.1"
