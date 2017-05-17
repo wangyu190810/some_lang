@@ -36,9 +36,6 @@
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.分割ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.空格分割ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.制表符分割ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.逗号分割ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.分号分割ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -99,10 +96,7 @@
             // 分割ToolStripMenuItem
             // 
             this.分割ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.空格分割ToolStripMenuItem,
-            this.制表符分割ToolStripMenuItem,
-            this.逗号分割ToolStripMenuItem,
-            this.分号分割ToolStripMenuItem});
+            this.空格分割ToolStripMenuItem});
             this.分割ToolStripMenuItem.Name = "分割ToolStripMenuItem";
             this.分割ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.分割ToolStripMenuItem.Text = "分割";
@@ -113,24 +107,6 @@
             this.空格分割ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.空格分割ToolStripMenuItem.Text = "空格分割";
             this.空格分割ToolStripMenuItem.Click += new System.EventHandler(this.空格分割ToolStripMenuItem_Click);
-            // 
-            // 制表符分割ToolStripMenuItem
-            // 
-            this.制表符分割ToolStripMenuItem.Name = "制表符分割ToolStripMenuItem";
-            this.制表符分割ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.制表符分割ToolStripMenuItem.Text = "制表符分割";
-            // 
-            // 逗号分割ToolStripMenuItem
-            // 
-            this.逗号分割ToolStripMenuItem.Name = "逗号分割ToolStripMenuItem";
-            this.逗号分割ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.逗号分割ToolStripMenuItem.Text = "逗号分割";
-            // 
-            // 分号分割ToolStripMenuItem
-            // 
-            this.分号分割ToolStripMenuItem.Name = "分号分割ToolStripMenuItem";
-            this.分号分割ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.分号分割ToolStripMenuItem.Text = "分号分割";
             // 
             // richTextBox2
             // 
@@ -209,9 +185,6 @@
         private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 分割ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 空格分割ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 制表符分割ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 逗号分割ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 分号分割ToolStripMenuItem;
         private System.Windows.Forms.RichTextBox richTextBox2;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
