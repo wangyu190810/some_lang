@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Configuration;
 
 namespace split_content
 {
@@ -46,7 +47,46 @@ namespace split_content
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
+            this.richTextBox2.DragEnter += new DragEventHandler(richTextBox2_DragEnter);
+            this.richTextBox2.DragDrop += new DragEventHandler(richTextBox2_DragDrop);
+            this.richTextBox2.AllowDrop = true;
 
+
+        }
+
+        void richTextBox2_DragDrop(object sender, DragEventArgs e)
+        {
+            object filename = e.Data.GetData("FileDrop");
+            if (filename != null)
+            {
+                var list = filename as string[];
+                string filetype = list[0].Substring(list[0].LastIndexOf(@"\") + 1);
+
+                if (filetype.IndexOf(".") != -1)
+                {
+                    string file_ext = filetype.Split('.')[1];
+                    //String allow_file_ext = System.Configuration.ConfigurationSettings.AppSettings['lang'].ToString();
+                    String allow_file_ext = System.Configuration.ConfigurationManager.AppSettings["lang"].ToString();
+                    if (allow_file_ext.IndexOf(file_ext) != -1) {
+                        richTextBox2.Clear();
+                        richTextBox2.LoadFile(list[0], RichTextBoxStreamType.PlainText);
+                    }                
+                }
+                else
+                {
+                    MessageBox.Show("Sorry, I cannot support this file type");
+                }
+
+
+
+
+            }
+        }
+
+        void richTextBox2_DragEnter(object sender, DragEventArgs e)
+        {
+            
         }
 
         private void 打开ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -212,6 +252,16 @@ namespace split_content
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
