@@ -1,4 +1,4 @@
-package Pool;
+package ConnPool;
 
 import java.sql.Connection;
 import java.util.concurrent.CountDownLatch;
