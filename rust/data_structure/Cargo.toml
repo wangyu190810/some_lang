@@ -1,0 +1,6 @@
+[package]
+name = "data_structure"
+version = "0.1.0"
+authors = ["wangyu <190810401@qq.com>"]
+
+[dependencies]
