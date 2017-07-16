@@ -94,17 +94,12 @@ namespace OCRparse
             var result = client.VehicleLicense(image);
         }
 
+       
 
 
 
 
 
-
-    }
-
-
-
-    
-
+}
 
 }
