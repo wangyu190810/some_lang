@@ -1,3 +1,5 @@
+use std::thread;
+use std::sync::{Arc, Mutex};
 
 const SIZE: usize = 1000;
 
@@ -17,6 +19,7 @@ pub trait Ringqimp {
     fn ringq_push<'a>(&mut self, ringq: i32);
     fn ringq_poll<'a>(&mut self, ringq: i32);
     fn new() -> RingQ;
+    fn ringq_print<'a>(&mut self);
     // add code here
 
     // add code here
@@ -45,6 +48,9 @@ impl Ringqimp   for RingQ{
        };  
     }
 
+    fn ringq_print<'a>(&mut self){
+        println!("print ringq data {:?}",self);
+    }
 
 
     fn ringq_push(&mut self, data :i32 ){
@@ -77,12 +83,29 @@ impl Ringqimp   for RingQ{
 }
 
 pub fn run(){
-    let mut ringq = RingQ::new();
-    ringq.ringq_push(100);
-    for  row  in 1..1009{
-        ringq.ringq_push(row);
+    let  mut ringq = Arc::new(Mutex::new(RingQ::new()));
+    for  row  in 1..10{
+        let mut ringq_clone = ringq.clone();
+        thread::spawn(move || {
+            let mut ringq_push = ringq_clone.lock().unwrap();
+            {
+                for val in 10..15{
+                    ringq_push.ringq_push(row * val);
+                    if (ringq_push.space.len() == 45){
+                        ringq_push.ringq_print()
+                    }
+                }
+            }
+        }).join().expect("thread::spawn failed");
     }
-    for  row  in 1..1009{
-        ringq.ringq_poll(row);
-    }
+    // for  row  in 1..10{
+    //     thread::spawn(move || {
+    //         for val in 1..10{
+    //             let mut rinq_data = ringq_clone.lock().unwrap();
+    //             rinq_data.ringq_push(val);
+    //         }
+
+    //     });
+    // }
+ 
 }
