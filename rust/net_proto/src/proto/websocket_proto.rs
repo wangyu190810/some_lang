@@ -1,6 +1,6 @@
 use std::io;
 use std::str;
-use bytes::{BytesMut, BufMut,IntoBuf,Buf};
+use bytes::{BytesMut, BufMut, IntoBuf, Buf};
 use bytes::buf::FromBuf;
 // use bytes::buf::FromBuf::from_buf;
 use tokio_io::codec::{Encoder, Decoder};
@@ -10,52 +10,65 @@ use tokio_service::Service;
 use tokio_io::{AsyncRead, AsyncWrite};
 use tokio_io::codec::Framed;
 use tokio_proto::pipeline::ServerProto;
-
+use base64;
+use sha_1;
+use sha1;
 use std::collections::HashMap;
 
 
 
 pub struct LineCodec;
-  
+
 
 impl LineCodec {
     // parse websocket proto
 
 
-    fn parse_headers(msg : String) -> String{
-        
+    fn parse_headers(msg: String) -> String {
+        let mut head_str:String = String::from(""); 
         let mut headers: HashMap<String, String> = HashMap::new();
-        let mut it = msg.split("\r\n");
-        while let Some(kv) = it.next(){
-            let mut it = kv.split(":");
-            if let Some(k) = it.next(){
-                 if let Some(v) = it.next() {
+        if let Some(data) = msg.split("\r\n\r\n").next(){
+        let mut it = data.split("\r\n");
+        let mut key: String = String::from("");
+        while let Some(kv) = it.next() {
+            let mut it = kv.split(": ");
+            if let Some(k) = it.next() {
+                if let Some(v) = it.next() {
                     headers.insert(k.to_string(), v.to_string());
-                }
-            }
-        }
-        let mut handshake = String::from("\
-HTTP/1.1 101 Web Socket Protocol Handshake\r\n\
-Upgrade: webSocket\r\n\
-Connection: Upgrade\r\n\
-Sec-WebSocket-Accept:{:}\r\n\
-Sec-WebSocket-Origin: {:}\r\n\
-Sec-WebSocket-Location: {:}\r\n\r\n\
-");
-        // let head_str = format!(handshake,headers.get("Origin").unwrap(), headers.get("token").unwrap(),headers.get("Location").unwrap());
-        // return head_str;
-        return handshake;
-    }
-}
+                    if (k == "Sec-WebSocket-Key") {
+                        let mut m = sha1::Sha1::new();
+                        let screct_key = v.to_owned() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+                        m.update(screct_key.as_bytes());
+                        // let  = m.digest().to_string()
+                        let key = base64::encode(&m.digest().to_string());
+                    }
 
+            }
+        }}
+let resp = format!("HTTP/1.1 101 Web Socket Protocol Handshake\r\n
+Upgrade: webSocket\r\n
+Connection: Upgrade\r\n
+Sec-WebSocket-Accept: {}\r\n"
+                             ,key           );
+
+        let mut handshake = String::from(resp);
+        // let head_str = format!(handshake,key);
+        head_str = handshake;
+        return head_str;
+    }else{
+            return head_str;
+    }
+
+}
+}
 
 
 impl Decoder for LineCodec {
     type Item = String;
     type Error = io::Error;
 
-    fn decode(&mut self, buf: &mut IntoBuf) -> io::Result<Option<String>> {
-        if let Some(i) = Vec::from_buf(buf) {
+    fn decode(&mut self, buf: &mut BytesMut) -> io::Result<Option<String>> {
+        if let Some(i) = buf.iter().position(|&b| b == b'\n') {
             // remove the serialized frame from the buffer.
             let line = buf.split_to(i);
 
@@ -71,6 +84,7 @@ impl Decoder for LineCodec {
         } else {
             Ok(None)
         }
+        
     }
 }
 
@@ -80,7 +94,10 @@ impl Encoder for LineCodec {
     type Error = io::Error;
 
     fn encode(&mut self, msg: String, buf: &mut BytesMut) -> io::Result<()> {
-         buf.extend(Self.parse_headers(msg).as_bytes());
+        // buf.extend(Self.parse_headers(msg).as_bytes());
+        buf.extend(msg.as_bytes());
+        buf.extend(b"\n");
+ 
         Ok(())
     }
 }

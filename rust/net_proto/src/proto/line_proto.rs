@@ -16,6 +16,7 @@ impl Decoder for LineCodec {
     type Error = io::Error;
 
     fn decode(&mut self, buf: &mut BytesMut) -> io::Result<Option<String>> {
+        // if let Some(i) = buf.iter().position(|&b| b == b'\n') {
         if let Some(i) = buf.iter().position(|&b| b == b'\n') {
             // remove the serialized frame from the buffer.
             let line = buf.split_to(i);
