@@ -14,7 +14,7 @@ impl<T: Ord> BTree<T> {
 	fn new() -> BTree<T> {
 		BTree::Empty
 	}
-
+	
 	fn insert(&mut self, nv: T) {
 		match self {
 			&mut BTree::Leaf { ref v, ref mut l, ref mut r } => {
