@@ -1,4 +1,5 @@
 use bytebuffer::ByteBuffer;
+use time;
 
 pub fn test_cast(){
 
@@ -91,19 +92,29 @@ impl TestCase {
         }
     }
 pub fn test_pack_unpack(){
-
-    let id = 1;
+     let Time = time::now();
+     println!("{:?}",time::now().rfc822z());
+     println!("{:?}",time::strftime("%a, %d %b %Y %T %z",&Time));
+   
+    for _ in (0..1000000) {
+         let id = 1;
         let msg_type= 1;
         let msg = "abc".to_string();
         let length = (id.to_string().len() + msg_type.to_string().len() + msg.len()) as u64 ;
-        println!("{}", length);
+        // println!("{}", length);
         let testcast = TestCase::new(id,msg_type,msg,length);
         let clone_data = testcast.clone();
         let mut pack_data = testcast.pack();
         // println("{}")
-        println!("orig {}",clone_data.msg);
-        println!("unpack {:?}",unpuck(pack_data).msg)
+        // println!("orig {}",clone_data.msg);
+        // println!("unpack {:?}",unpuck(pack_data).msg)
+    }
+    // println!("{:?}",time::now());
+    let Time_2 = time::now();
+     println!("{:?}",time::strftime("%a, %d %b %Y %T %z",&Time_2));
+    // println!("{:?}",Time.tm_nsec - Time_2.tm_nsec);
 
+    
 }
 
 
