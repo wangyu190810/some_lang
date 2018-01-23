@@ -11,14 +11,20 @@ let mut rd_buffer = ByteBuffer::from_bytes(&vec![0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0
 let value = rd_buffer.read_u64(); //Value contains 1
 println!("{:?}",value );
 let mut buffer = ByteBuffer::new();
-buffer.write_string("Helloasdfasdf");
+// buffer.write_string("Helloasd");
 
-buffer.write_string("Hello");
+// buffer.write_string("Hello");
+let sparkle_heart = "Hello123123asdfasdfas".to_string();
+
+let bytes = sparkle_heart.into_bytes();
+let length = bytes.len();
+println!("read_bytes {:?}",  length);
+buffer.write_bytes(&bytes);
 
 // read_bytes(&mut self, size: usize) -> Vec<u8>
 // println!("read_bytes {:?}",  buffer.read_string());
 println!("read_bytes {:?}",  String::from_utf8(buffer.read_bytes(9)).unwrap());
-println!("read_bytes {:?}",  String::from_utf8(buffer.read_bytes(9)).unwrap());
+println!("read_bytes {:?}",  String::from_utf8(buffer.read_bytes(12)).unwrap());
 }
 
 //  args = pack('<HB1sLQHHL3sBQlLHBB4s', 52, 1, 'b', 1200, 
@@ -55,12 +61,13 @@ impl TestCase {
     // }
 
     pub fn pack(self) -> ByteBuffer{
-        
+        let bytes = self.msg.into_bytes();
+        let length = bytes.len() as u64;
         let mut wt_buffer = ByteBuffer::new();
-        wt_buffer.write_u64(self.length);
+        wt_buffer.write_u64(self.length + length);
         wt_buffer.write_u32(self.id);
         wt_buffer.write_i8(self.msg_type);
-        wt_buffer.write_string(self.msg.as_str());
+        wt_buffer.write_bytes(&bytes);
         return wt_buffer
     }
 
@@ -84,11 +91,13 @@ impl TestCase {
 
  pub fn unpuck(rd_buffer :ByteBuffer ) -> TestCase{
         let mut rd_buffer = rd_buffer;
+        let pack_length =  rd_buffer.read_u64();
+        let msg_length = pack_length - 13 ;
         TestCase{
-            length: rd_buffer.read_u64(),
+            length: pack_length,
             id: rd_buffer.read_u32(),
             msg_type: rd_buffer.read_i8(),
-            msg: String::from_utf8(rd_buffer.read_bytes(7)).unwrap()
+            msg: String::from_utf8(rd_buffer.read_bytes(msg_length as usize)).unwrap()
         }
     }
 pub fn test_pack_unpack(){
