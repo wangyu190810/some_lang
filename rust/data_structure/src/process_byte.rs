@@ -1,5 +1,17 @@
+
+use serde_json;
+use serde_derive;
+use serde_json::Error;
+use redis_client;
+use redis_client::errors::RedisError;
+use redis_client::commands::{CommandBuilder, CommandSender, CommandSenderAsync};
+
+use serialize::{Decodable, Encodable, json};
+
 use bytebuffer::ByteBuffer;
 use time;
+
+use JsonData;
 
 pub fn test_cast() {
     let mut wt_buffer = ByteBuffer::new();
@@ -21,14 +33,10 @@ pub fn test_cast() {
 
     // read_bytes(&mut self, size: usize) -> Vec<u8>
     // println!("read_bytes {:?}",  buffer.read_string());
-    println!(
-        "read_bytes {:?}",
-        String::from_utf8(buffer.read_bytes(9)).unwrap()
-    );
-    println!(
-        "read_bytes {:?}",
-        String::from_utf8(buffer.read_bytes(12)).unwrap()
-    );
+    println!("read_bytes {:?}",
+             String::from_utf8(buffer.read_bytes(9)).unwrap());
+    println!("read_bytes {:?}",
+             String::from_utf8(buffer.read_bytes(12)).unwrap());
 }
 
 //  args = pack('<HB1sLQHHL3sBQlLHBB4s', 52, 1, 'b', 1200,
@@ -39,7 +47,7 @@ pub fn test_cast() {
 //     args = pack('<HB1sLQHHL3sBQlLHBB4s', 52, 1, 'b', 1200,
 //      12345678905050, 36, 53, 123988, 'aaa', 1, 150000, 160000, 2, 0, 1, 1, 'xxxx')
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,Serialize, Deserialize,Decodable,Encodable)]
 pub struct TestCase {
     length: u64,
     id: u32,
@@ -100,12 +108,17 @@ pub fn unpuck(rd_buffer: ByteBuffer) -> TestCase {
         msg: String::from_utf8(rd_buffer.read_bytes(msg_length as usize)).unwrap(),
     }
 }
-pub fn test_pack_unpack() {
+pub fn test_pack_unpack() -> Result<(), RedisError> {
     let Time = time::now();
     println!("{:?}", time::now().rfc822z());
     println!("{:?}", time::strftime("%a, %d %b %Y %T %z", &Time));
+    let mut async_client = try!(redis_client::RedisClientAsync::new("192.168.1.8", "6379"));
+    // let mut async_client = try!(redis_client::RedisClientAsync::new("localhost", "6379"));
+    let cmd = &mut redis_client::RedisCommand::new();
+    
+   
 
-    for _ in (0..1000000) {
+    for nums in (0..10) {
         let id = 1;
         let msg_type = 1;
         let msg = "abc".to_string();
@@ -114,14 +127,51 @@ pub fn test_pack_unpack() {
         let testcast = TestCase::new(id, msg_type, msg, length);
         let clone_data = testcast.clone();
         let mut pack_data = testcast.pack();
+        // let TestCasejson =  unpuck(pack_data);
+
+        let mut encoded = serde_json::to_string(&clone_data).unwrap_or(r"test".to_string());
+        // println!("{}",encoded.as_str());
+        // let  save = encoded.as_str();
+        let  save = JsonData::str_data(encoded);
+        println!("{:?}", save);
+        let  str_line: &str = "{\"length\":5,\"id\":1,\"msg_type\":1,\"msg\":\"abc\"}";
+        println!("{}{}",nums,str_line);
+         cmd.hset("rs_test",nums, str_line);
+        //  {
+        //          Ok(values) => {
+                   
+        //          },
+        //          Err(err) => println!("{:?}", err.to_string()),
+        //     }
+        // };
+        
+    }
+        // Deserialize using `json::decode`
+        // let decoded: TestCasejson = json::decode(&encoded[..]).unwrap();
         // println("{}")
         // println!("orig {}",clone_data.msg);
         // println!("unpack {:?}",unpuck(pack_data).msg)
-    }
+    // }
     // println!("{:?}",time::now());
+    
+    
+     try!(async_client.exec_redis_pipeline_command_async(cmd, |results| {
+        match results {
+            Ok(values) => {
+                // println!("{}",values);
+                for value in values {
+                    println!("{:?}", value.convert::<String>())
+                }
+            },
+            Err(err) => println!("{:?}", err.to_string()),
+        };
+    }));
+
+
     let Time_2 = time::now();
     println!("{:?}", time::strftime("%a, %d %b %Y %T %z", &Time_2));
-    // println!("{:?}",Time.tm_nsec - Time_2.tm_nsec);
+    // // println!("{:?}",Time.tm_nsec - Time_2.tm_nsec);
+    Ok(())
 }
 
 
