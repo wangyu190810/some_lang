@@ -6,3 +6,8 @@ authors = ["wangyu <190810401@qq.com>"]
 [dependencies]
 bytebuffer="*"
 time="*"
+serde_json = "1.0"
+serde="*"
+serde_derive="*"
+redis-client="*"
+
