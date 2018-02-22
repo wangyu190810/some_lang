@@ -13,6 +13,11 @@ use time;
 
 use JsonData;
 
+use std::io::Cursor;
+use byteorder::{BigEndian, ReadBytesExt};
+
+
+
 pub fn test_cast() {
     let mut wt_buffer = ByteBuffer::new();
     wt_buffer.write_u16(1); // buffer contains [0x00, 0x1] if little endian
@@ -174,6 +179,10 @@ pub fn test_pack_unpack() -> Result<(), RedisError> {
     Ok(())
 }
 
+fn set_u16_le(a: &mut [u8], v: u16) {
+    a[0] = v as u8;
+    a[1] = (v >> 8) as u8;
+}
 
 
 #[cfg(test)]
@@ -182,7 +191,17 @@ mod tests {
     #[test]
 
     fn it_works() {
-        // let id = 1;
+//         let mut end:u16;
+
+//         set_u16_le(vec![2, 5],end);
+//         println!("{}",end);
+
+//         let mut rdr = Cursor::new(vec![2, 5, 3, 0]);
+// // Note that we use type parameters to indicate which kind of byte order
+// // we want!
+// assert_eq!(517, rdr.read_u16::<BigEndian>().unwrap());
+// assert_eq!(768, rdr.read_u16::<BigEndian>().unwrap());
+//         // let id = 1;
         // let msg_type = 1;
         // let msg = "abc".to_string();
         // let length = 100;

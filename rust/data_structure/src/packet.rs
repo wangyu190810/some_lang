@@ -1,5 +1,51 @@
 use bytebuffer::ByteBuffer;
+
+use byteorder::{ByteOrder, BigEndian, LittleEndian};
 use time;
+
+
+
+
+// 包头数据
+
+#[derive(Debug, Clone)]
+pub struct Head {
+    pub MsgSize: u16,
+    pub MsgType: u16
+}
+
+impl Head {
+    pub fn new(head:Vec<u8>
+        
+
+    ) -> Head {
+        let mut buffer = ByteBuffer::new();
+            // buffer.set_endian(Endian::LittleEndian);
+            buffer.write_u8(head[0]);
+            buffer.write_u8(head[1]);
+            buffer.write_u8(head[2]);
+            buffer.write_u8(head[3]);
+            Head::unpack(buffer)
+        }
+    
+
+    pub fn pack(self) -> ByteBuffer {
+        let mut wt_buffer = ByteBuffer::new();
+        wt_buffer.write_u16(self.MsgSize);
+        wt_buffer.write_u16(self.MsgType);
+        return wt_buffer;
+    }
+
+
+    pub fn unpack(rd_buffer: ByteBuffer) -> Head {
+        let mut rd_buffer = rd_buffer;
+        Head {
+            MsgSize: rd_buffer.read_u16(),
+            MsgType: rd_buffer.read_u16()
+        }
+    }
+}
+
 
 
 
@@ -322,6 +368,10 @@ impl VCMTrigger {
 }
 
 
+
+
+
+
 // # msg 60 成交汇总
 // def get_msg_statistics(args):
 //     data = unpack('<HHLQqllllLq', args)
@@ -427,9 +477,287 @@ impl Statistics {
 }
 
 
+
+// # msg 61 市场成交量    
+// def get_msg_market_turnover(args):
+//     data = unpack('<HH4s3s1sq', args)
+//     data_dict = {
+//         'MsgSize' : data[0],
+//         'MsgType' : data[1],
+//         'MarketCode' : data[2],
+//         'CurrencyCode' : data[3],
+//         'Filler' : data[4],
+//         'Turnover' : data[5]
+//     }
+//     return data_dict
+
+
+#[derive(Debug, Clone)]
+pub struct MarketTurnover {
+    MsgSize: u16,
+    MsgType: u16,
+    MarketCode: String,
+    CurrencyCode: String,
+    Filler: String,
+    Turnover: i64
+}
+
+
+impl MarketTurnover {
+    pub fn new(
+          MsgSize: u16,
+    MsgType: u16,
+    MarketCode: String,
+    CurrencyCode: String,
+    Filler: String,
+    Turnover: i64
+    ) -> MarketTurnover {
+        MarketTurnover {
+            MsgSize: MsgSize,
+            MsgType: MsgType,
+            MarketCode: MarketCode,
+    CurrencyCode: CurrencyCode,
+    Filler: Filler,
+    Turnover: Turnover
+        }
+    }
+
+    pub fn pack(self) -> ByteBuffer {
+        let mut wt_buffer = ByteBuffer::new();
+        wt_buffer.write_u16(self.MsgSize);
+        wt_buffer.write_u16(self.MsgType);
+        wt_buffer.write_bytes(&self.MarketCode.into_bytes());
+        wt_buffer.write_bytes(&self.CurrencyCode.into_bytes());
+        wt_buffer.write_bytes(&self.Filler.into_bytes());
+        wt_buffer.write_i64(self.Turnover);
+        return wt_buffer;
+    }
+
+
+    pub fn unpack(rd_buffer: ByteBuffer) -> MarketTurnover {
+        let mut rd_buffer = rd_buffer;
+        MarketTurnover {
+            MsgSize: rd_buffer.read_u16(),
+            MsgType: rd_buffer.read_u16(),
+            MarketCode: String::from_utf8(rd_buffer.read_bytes(4 as usize)).unwrap(),
+            CurrencyCode: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
+            Filler: String::from_utf8(rd_buffer.read_bytes(1 as usize)).unwrap(),
+            Turnover: rd_buffer.read_i64(),
+        }
+    }
+}
+
+
+    
+// # msg 70 指数定义    
+// def get_msg_index_definition(args):
+//     data = unpack('<HH11s1s3s1s', args)
+//     data_dict = {
+//         'MsgSize' : data[0],
+//         'MsgType' : data[1],
+//         'IndexCode' : data[2],
+//         'IndexSource' : data[3],
+//         'CurrencyCode' : data[4],
+//         'Filler' : data[5]
+//     }
+//     return data_dict
+    
+
+
+#[derive(Debug, Clone)]
+pub struct IndexDefinition {
+    MsgSize: u16,
+    MsgType: u16,
+    IndexCode: String,
+    IndexSource: String,
+    CurrencyCode:String,
+    Filler: String,
+}
+
+
+impl IndexDefinition {
+    // pub fn new(
+    //       MsgSize: u16,
+    // MsgType: u16,
+    // IndexCode: String,
+    // IndexSource: String,
+    // CurrencyCode:String,
+    // Filler: String,
+    // ) -> IndexDefinition {
+    //     IndexDefinition {
+    //         MsgSize: MsgSize,
+    //         MsgType: MsgType,
+    //       IndexCode: IndexCode,
+    // IndexSource: IndexSource,
+    // CurrencyCode:CurrencyCode,
+    // Filler: Filler
+
+     pub fn new(indexdefinition:Vec<u8>
+        
+
+    ) -> IndexDefinition {
+        
+     let mut buffer = ByteBuffer::new();
+
+            // buffer.set_endian(LittleEndian);
+            for index in 0..20{
+                buffer.write_u8(indexdefinition[index]);
+            }
+            IndexDefinition::unpack(buffer)
+        }
+    
+        
+
+    pub fn pack(self) -> ByteBuffer {
+        let mut wt_buffer = ByteBuffer::new();
+        wt_buffer.write_u16(self.MsgSize);
+        wt_buffer.write_u16(self.MsgType);
+        wt_buffer.write_bytes(&self.IndexCode.into_bytes());
+        wt_buffer.write_bytes(&self.IndexSource.into_bytes());
+        wt_buffer.write_bytes(&self.CurrencyCode.into_bytes());
+        wt_buffer.write_bytes(&self.Filler.into_bytes());
+        return wt_buffer;
+    }
+
+
+    pub fn unpack(rd_buffer: ByteBuffer) -> IndexDefinition {
+        let mut rd_buffer = rd_buffer;
+        IndexDefinition {
+            MsgSize: rd_buffer.read_u16(),
+            MsgType: rd_buffer.read_u16(),
+            IndexCode: String::from_utf8(rd_buffer.read_bytes(11 as usize)).unwrap(),
+            IndexSource: String::from_utf8(rd_buffer.read_bytes(1 as usize)).unwrap(),
+            CurrencyCode: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
+            Filler: String::from_utf8(rd_buffer.read_bytes(1 as usize)).unwrap(),
+        }
+    }
+}
+
+
+
+
+
+
+#[derive(Debug, Clone)]
+pub struct AddOddLotOrder  {
+   pub  MsgSize: u16,
+   pub  MsgType: u16,
+   pub  SecurityCode: u32,
+   pub  OrderId: u64,
+   pub  Price:i32,
+   pub  Quantity: u32,
+   pub  BrokerID:u16,
+   pub  Side:u16
+}
+
+
+impl AddOddLotOrder {
+    pub fn new(
+           head:Vec<u8>
+        
+    ) -> AddOddLotOrder {
+    //     AddOddLotOrder {
+
+    //          MsgSize: MsgSize,
+    // MsgType: MsgType,
+    // SecurityCode: SecurityCode,
+    // OrderId: OrderId,
+    // Price:Price,
+    // Quantity: Quantity,
+    // BrokerID:BrokerID,
+    // Side:Side
+
+     let mut buffer = ByteBuffer::new();
+
+            // buffer.set_endian(LittleEndian);
+            for index in 0..28{
+                buffer.write_u8(head[index]);
+            }
+            AddOddLotOrder::unpack(buffer)
+        
+        
+    }
+
+    // pub fn pack(self) -> ByteBuffer {
+    //     let mut wt_buffer = ByteBuffer::new();
+    //     wt_buffer.write_u16(self.MsgSize);
+    //     wt_buffer.write_u16(self.MsgType);
+    //     wt_buffer.write_bytes(&self.IndexCode.into_bytes());
+    //     wt_buffer.write_bytes(&self.IndexSource.into_bytes());
+    //     wt_buffer.write_bytes(&self.CurrencyCode.into_bytes());
+    //     wt_buffer.write_bytes(&self.Filler.into_bytes());
+    //     return wt_buffer;
+    // }
+
+
+    pub fn unpack(rd_buffer: ByteBuffer) -> AddOddLotOrder {
+        let mut rd_buffer = rd_buffer;
+        AddOddLotOrder {
+            MsgSize: rd_buffer.read_u16(),
+            MsgType: rd_buffer.read_u16(),
+    SecurityCode: rd_buffer.read_u32(),
+    OrderId: rd_buffer.read_u64(),
+    Price:rd_buffer.read_i32(),
+    Quantity: rd_buffer.read_u32(),
+    BrokerID:rd_buffer.read_u16(),
+    Side:rd_buffer.read_u16(),
+        }
+    }
+}
+
+
+// # msg 71 指数数据    
+// def get_msg_index_data(args):
+//     data = unpack('<HH11s1sqqqqqqqqqqql1s3s', args)
+//     data_dict = {
+//         'MsgSize' : data[0],
+//         'MsgType' : data[1],
+//         'IndexCode' : data[2],
+//         'IndexStatus' : data[3],
+//         'IndexTime' : data[4],
+//         'IndexValue' : data[5],
+        
+//         'NetChgPrevDay' : data[6],
+//         'HighValue' : data[7],
+//         'LowValue' : data[8],
+//         'EASValue' : data[9],
+//         'IndexTurnover' : data[10],
+//         'OpeningValue' : data[11],
+        
+//         'ClosingValue' : data[12],
+//         'PreviousSesClose' : data[13],
+//         'IndexVolume' : data[14],
+//         'NetChgPrevDayPct' : data[15],
+//         'Exception' : data[16],
+//         'Filler' : data[17]
+//     }
+//     return data_dict
+
+
+pub fn  save_data( buff_bytes:Vec<u8>,rd_buffer:&mut  ByteBuffer) -> ByteBuffer {
+    for buff_byte in buff_bytes{
+        if (buff_byte != 0){
+            rd_buffer.write_u8(buff_byte);
+        }
+    }
+    return rd_buffer;
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    
+    #[test]
+    fn test_Head() {
+        let mut price = Head::new([128, 0, 1, 33].to_vec());
+        let clone = price.clone();
+        let mut wt_buffer = price.pack();
+        let unpack = Head::unpack(wt_buffer);
+        assert_eq!(clone.MsgSize, unpack.MsgSize)
+    }
 
     #[test]
     fn test_CloseingPrice() {
@@ -507,6 +835,24 @@ mod tests {
         let mut wt_buffer = price.pack();
         let unpack = Statistics::unpack(wt_buffer);
         assert_eq!(clone.ShortSellSharesTraded, unpack.ShortSellSharesTraded)
+    }
+    #[test]
+    fn test_MarketTurnover() {
+        let mut price = MarketTurnover::new(20, 61, "NAS\0".to_string(), "HKD".to_string(), "a".to_string(), 12312);
+        let clone = price.clone();
+        let mut wt_buffer = price.pack();
+        let unpack = MarketTurnover::unpack(wt_buffer);
+        println!("{}",unpack.MarketCode);
+        assert_eq!(clone.MarketCode, unpack.MarketCode)
+    }
+    #[test]
+    fn test_IndexDefinition() {
+        let mut price = IndexDefinition::new(20, 70, "00001100100".to_string(), "C".to_string(), "HKD".to_string(), "C".to_string());
+        let clone = price.clone();
+        let mut wt_buffer = price.pack();
+        let unpack = IndexDefinition::unpack(wt_buffer);
+        println!("{}",unpack.IndexCode);
+        assert_eq!(clone.IndexCode, unpack.IndexCode)
     }
 
 }
