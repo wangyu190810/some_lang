@@ -12,7 +12,7 @@
             "stopAtEntry": false,                  
             "cwd": "${workspaceRoot}",                  
             "externalConsole": true,                  
-            "preLaunchTask": "g++"　　                  
+            "preLaunchTask": "gcc"　　                  
             }
     ]
  }

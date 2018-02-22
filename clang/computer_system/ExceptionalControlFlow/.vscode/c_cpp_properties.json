@@ -3,13 +3,13 @@
         {
             "name": "Win32",
             "includePath": [
-                "D:/winbuild/include/c++/4.8.3"
+                "D:/winbuild/lib64/gcc/x86_64-w64-mingw32/4.8.3"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "",
                 "path": [
-                    "D:/winbuild/include/c++/4.8.3",
+                    "D:/winbuild/lib64/gcc/x86_64-w64-mingw32/4.8.3",
                     "${workspaceRoot}"
                 ]
             },
