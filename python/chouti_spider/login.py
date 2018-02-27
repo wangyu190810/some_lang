@@ -1,4 +1,4 @@
-# -*-coding:utf-8-*-
+﻿# -*-coding:utf-8-*-
 import http.cookiejar
 import json
 import pprint
