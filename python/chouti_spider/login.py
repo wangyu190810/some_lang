@@ -23,7 +23,7 @@ session.cookies = http.cookiejar.LWPCookieJar("cookie")
 try:
     session.cookies.load(ignore_discard=True)
 except IOError:
-    print("Cookie未加载！")
+    print("Cookie load faile")
 
 
 
@@ -93,10 +93,10 @@ def comments(link):
 
 if __name__ == '__main__':
     if isLogin():
-        print('您已经登录')
+        print('is login')
     else:
-        phone = input('输入账号：')
-        password = input('输入密码：')
+        phone = input('phone：')
+        password = input('password：')
         if phone.startswith("86") is False:
             phone += "86"
         login(phone, password)
