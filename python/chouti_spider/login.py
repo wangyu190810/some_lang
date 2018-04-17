@@ -29,7 +29,7 @@ except IOError:
 
 def login(phone, password):
     """登录操作"""
-    url = 'http://dig.chouti.com/login'
+    url = 'https://dig.chouti.com/login'
     data = {'phone':phone,'password':password,"oneMonth":1}
     result = session.post(url, data=data, headers=headers)
     print(result.text)
@@ -39,7 +39,7 @@ def login(phone, password):
 def isLogin():
     # 通过查看用户个人信息来判断是否已经登录
     timestamp = time.time() * 1000
-    url = "http://dig.chouti.com/getTopTenLinksOrComments.json?_=%s" %timestamp
+    url = "https://dig.chouti.com/getTopTenLinksOrComments.json?_=%s" %timestamp
     # 禁止重定向，否则登录失败重定向到首页也是响应200
     response = session.get(url, headers=headers,
                              allow_redirects=False)
