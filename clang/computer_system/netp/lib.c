@@ -12,3 +12,11 @@ void echo(int connfd){
     }
 
 }
+
+void command(void){
+    char buf[MAXLINE];
+    if (!Fgets(buf,MAXLINE,stdin))
+        exit(0);
+    printf("%s",buf);
+
+}
