@@ -19,10 +19,10 @@ int main(int argc, char **argv){
     listenfd = Open_listenfd(port);
     FD_ZERO(&read_set);
     FD_SET(STDIN_FILENO,& ready_set);
-    FD_SET(listenfd,&ready_set);
+    FD_SET(listenfd,&read_set);
     while(1) {
         ready_set = read_set;
-        Select(listenfd + 1,&read_set, NULL, NULL, NULL);
+        Select(listenfd + 1,&ready_set, NULL, NULL, NULL);
         if (FD_ISSET(STDIN_FILENO,&ready_set) )
             command();
         if (FD_ISSET(listenfd, &ready_set)){
