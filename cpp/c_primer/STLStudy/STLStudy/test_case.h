@@ -4,4 +4,6 @@
 
 void vect_test();
 int iter_test();
+int outstrm_test();
+int outiter_test();
 #endif

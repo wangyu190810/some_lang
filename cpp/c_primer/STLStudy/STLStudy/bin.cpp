@@ -5,5 +5,6 @@ void main()
 {
 	vect_test();
 	iter_test();
-
+	outstrm_test();
+	outiter_test();
 }

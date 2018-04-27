@@ -123,6 +123,8 @@
   <ItemGroup>
     <ClCompile Include="bin.cpp" />
     <ClCompile Include="iterdemo.cpp" />
+    <ClCompile Include="outiter.cpp" />
+    <ClCompile Include="outstrm.cpp" />
     <ClCompile Include="vectdemo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

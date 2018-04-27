@@ -37,5 +37,11 @@
     <ClCompile Include="bin.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="outstrm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="outiter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
