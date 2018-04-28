@@ -2,15 +2,16 @@ use std::io::prelude::*;
 use std::net::TcpStream;
 
 use packet::{Head, AddOddLotOrder, IndexDefinition,save_data};
+use bytebuffer::ByteBuffer;
 
 pub fn head() {
-    let static buff_status: i32 = 4096;
-    let mut stream = TcpStream::connect("223.197.18.61:6309").unwrap();
+    let buff_status: u16 = 4096;
+    let mut stream = TcpStream::connect("127.0.0.1:6101").unwrap();
 
     // ignore the Result
     // let _ = stream.write(&[1])
     while true {
-        let mut buff = [0; buff_status];
+        let mut buff = [0; 4096];
         let _ = stream.read(&mut buff); // ignore here too
         // println!("{:?}",buff);
 
@@ -18,12 +19,12 @@ pub fn head() {
         while true {
             let mut len = buff_status;
             let mut buffer = ByteBuffer::new();
-            save_data(buff,buffer);
+            save_data(buff.to_vec(),&mut buffer);
 
             if(head.MsgSize > buff_status) {
                 len += buff_status;   
                 let _ = stream.read(&mut buff);
-                save_data(buff,buffer);
+                save_data(buff.to_vec(),&mut buffer);
             }else{
                 println!("msg size {}", head.MsgSize);
         let msg_type = head.MsgType;

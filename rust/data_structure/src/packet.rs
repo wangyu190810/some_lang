@@ -734,13 +734,12 @@ impl AddOddLotOrder {
 //     return data_dict
 
 
-pub fn  save_data( buff_bytes:Vec<u8>,rd_buffer:&mut  ByteBuffer) -> ByteBuffer {
+pub fn  save_data( buff_bytes:Vec<u8>,rd_buffer:&mut  ByteBuffer){
     for buff_byte in buff_bytes{
         if (buff_byte != 0){
             rd_buffer.write_u8(buff_byte);
         }
     }
-    return rd_buffer;
 }
 
 
