@@ -436,7 +436,7 @@ pub fn main() {
     // client connection.
     let state = Arc::new(Mutex::new(Shared::new()));
 
-    let addr = "127.0.0.1:6142".parse().unwrap();
+    let addr = "0.0.0.0:6142".parse().unwrap();
 
     // Bind a TCP listener to the socket address.
     //
