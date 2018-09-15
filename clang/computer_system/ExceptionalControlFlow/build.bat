@@ -1,0 +1,1 @@
+gcc  waitpid2.c  csapp.c -o waitpid2 -lpthread

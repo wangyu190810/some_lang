@@ -263,5 +263,37 @@ namespace split_content
         {
             Application.Exit();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(dbfPath))
+            {
+                MessageBox.Show("还没选择文件夹！");
+                return;
+            }
+            if (string.IsNullOrEmpty(comboBox1.Text))
+            {
+                MessageBox.Show("没有选择数据文件");
+                return;
+            }
+            string connectString = string.Format(
+                "Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Extended Properties=dBASE IV;User ID=Admin;Password=;"
+                , dbfPath);
+            using (OleDbConnection connection = new OleDbConnection(connectString))
+            {
+                DataSet ds = new DataSet();
+                try
+                {
+                    connection.Open();
+                    OleDbDataAdapter command = new OleDbDataAdapter("select * from " + comboBox1.Text, connection);
+                    command.Fill(ds, "ds");
+                    MessageBox.Show(ds.Tables[0].Rows.Count.ToString());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("error:{0}", ex.Message));
+                }
+            }
+        }
     }
 }

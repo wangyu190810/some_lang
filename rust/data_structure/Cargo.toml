@@ -4,3 +4,15 @@ version = "0.1.0"
 authors = ["wangyu <190810401@qq.com>"]
 
 [dependencies]
+time="*"
+serde_json = "1.0"
+serde="*"
+serde_derive="*"
+redis-client="*"
+redis = "*"
+byteorder = "0.3"
+# bytebuffer = "*"
+
+bytebuffer = {git="https://github.com/wangyu190810/rust-bytebuffer",branch = "master"}
+
+

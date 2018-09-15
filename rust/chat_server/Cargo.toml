@@ -1,0 +1,15 @@
+[package]
+name = "chat_server"
+version = "0.1.0"
+authors = ["wangyu190810 <190810401@qq.com>"]
+
+[dependencies]
+# tokio = "*"
+# tokio-io = "*"
+# futures = "*"
+# bytes = "*"
+
+tokio = "0.1"
+tokio-io = "0.1"
+futures = "0.1"
+bytes = "0.4"

@@ -290,49 +290,5 @@ fn process(req: Request){
     }
 }
 
-pub struct Server{
-    host:String,
-    port:usize,
-    pub static_path:String
-}
 
-impl Server{
-
-    pub fn new(host: &str, port: usize, static_path:&str ) -> Server{
-        Server{
-            host:host.to_string(),
-            port:port,
-            static_path: static_path.to_string()
-        }
-    }
-
-    fn run(&self){
-        // let addr = format!("{}:{}", self.host, self.port).as_str();
-
-        let listener = TcpListener::bind(format!("{}:{}",self.host,self.port).as_str()).unwrap();
-        // let listener = TcpListener::bind(&addr).unwrap();
-        // let rock: Arc<Rock> = Arc::new(self);
-        // accept connections and process them, spawning a new thread for each one
-        for stream in listener.incoming() {
-            match stream {
-                Ok(stream) => {
-                    Self::handle_client(&self,stream);
-                
-                }
-                Err(e) => { 
-                    print!("asdfasdf{:}", e);
-                    /* connection failed */ }
-            }
-        }
-        drop(listener);
-    }
-
-   
-
-    pub fn start(&self){
-        Self::run(self);
-    }
-
-  
-}
 
