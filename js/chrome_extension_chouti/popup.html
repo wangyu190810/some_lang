@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <style>
+      body {
+        min-width:357px;
+        overflow-x:hidden;
+      }
+
+      img {
+        margin:5px;
+        border:2px solid black;
+        vertical-align:middle;
+        width:75px;
+        height:75px;
+      }
+    </style>
+
+    <!-- JavaScript and HTML must be in separate files for security. -->
+    <script src="jquery-3.3.1.min" ></script>
+    <script src="popup.js"></script>
+    <script src = "contentscript.js" ></script>
+    
+  </head>
+      <body onLoad="autoclick('auto')">
+          <a id='auto' href="http://dig.chouti.com/link/17573736"><img border='0' src='test.gif' /></a>
+  </body>
+</html>
