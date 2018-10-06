@@ -5,6 +5,7 @@ use std::net::{TcpListener, TcpStream};
 
 use net::Pool::ThreadPool;
 use net::utils::{rule_data,rule_data_app,static_response};
+use net::func_test::test_make_map;
 
 pub struct Server{
     host:String,
@@ -97,6 +98,7 @@ impl Server {
 
 fn main(){
     // let  server = Server::new("0.0.0.0",5000,"/home/too/work/some_lang/rust/net/src/static/");
-    let  server = Server::new("0.0.0.0",5000,"./src/static/");
-    server.start();
+    // let  server = Server::new("0.0.0.0",5000,"./src/static/");
+    // server.start();
+    test_make_map()
 }
