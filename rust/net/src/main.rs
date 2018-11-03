@@ -5,7 +5,7 @@ use std::net::{TcpListener, TcpStream};
 
 use net::Pool::ThreadPool;
 use net::utils::{rule_data,rule_data_app,static_response};
-use net::func_test::test_make_map;
+use net::rule::test_make_map;
 
 pub struct Server{
     host:String,
@@ -68,7 +68,7 @@ impl Server {
                 resp.send(&mut stream);
             }
             else if req.path == "/"{
-                let resp =rule_data("/", req);
+                let resp =rule_data(req);
                 resp.send(&mut stream);
             }else if req.path == "/index"{
                 let resp = rule_data_app("/index", req);

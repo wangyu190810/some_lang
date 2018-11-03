@@ -4,7 +4,7 @@ use std::io::*;
 
 use query::{Request,Response};
 
-pub fn rule_data(roule: &str, req: Request) -> Response{
+pub fn rule_data(req: Request) -> Response{
     if let Some(req_str) = req.query{
         let name =  req_str.get("name").unwrap();
         let content = name.to_string();

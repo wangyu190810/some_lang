@@ -5,7 +5,9 @@ pub mod query;
 pub mod utils;
 pub mod Pool;
 // pub mod handler;
-pub mod func_test;
+// pub mod func_test;
+pub mod rule;
+
 
 #[cfg(test)]
 
