@@ -7,7 +7,7 @@ use packet::{save_data, AddOddLotOrder, Head, IndexDefinition, NominalPrice, Now
 pub fn head() {
     static buff_status:usize = 4096;
 
-    let mut stream = TcpStream::connect("58.87.86.221:6101").unwrap();
+    let mut stream = TcpStream::connect("218.253.82.29:6105").unwrap();
     // let mut stream = TcpStream::connect("127.0.0.1:5000").unwrap();
     // ignore the Result
     // let _ = stream.write(&[1])
@@ -35,49 +35,54 @@ pub fn head() {
         buff = [0; 4096];
         if (body.len() >= pkt_size as usize) {
             let body_clone = body.clone();
-            let body_pack = body.split_off(16);
+            let mut body_pack = body.split_off(16);
             let body_pack_clone = body_pack.clone();
             let body_head = Head::new(body_pack_clone);
-            // println!("MsgType :{}", body_head.MsgType);
+            println!("{}", body_head.MsgSize);
+            // body = body_pack.split_off(body_head.MsgSize as usize);
+            println!("MsgType :{}", body_head.MsgType);
             // println!("MsgSize :{}", body_head.MsgSize);
 
-            if (body_head.MsgType == 11){
-                 let body_data = NowPrice::new(body_pack);
-                // println!("{:?}", &body_pack_clone);
-                // println!("{}", body_data.MsgSize);
-                // println!("{}", body_data.MsgType);
-                // println!("{}", body_data.SecurityCode);
-                // println!("{}", body_data.MarketCode);
-            // break;
-            // if (body_data.MsgType == 11) {
-                // let body_pack_clone = body_pack.clone();
-                // let body_data = NowPrice::new(body_pack);
-                // // println!("{:?}", &body_pack_clone);
-                println!("{}", body_data.MsgSize);
-                println!("{}", body_data.MsgType);
-                println!("{}", body_data.SecurityCode);
-                println!("{}", body_data.MarketCode);
+            // if (body_head.MsgType == 11){
+            //      let body_data = NowPrice::new(body_pack);
+            //     // println!("{:?}", &body_pack_clone);
+            //     // println!("{}", body_data.MsgSize);
+            //     // println!("{}", body_data.MsgType);
+            //     // println!("{}", body_data.SecurityCode);
+            //     // println!("{}", body_data.MarketCode);
+            // // break;
+            // // if (body_data.MsgType == 11) {
+            //     // let body_pack_clone = body_pack.clone();
+            //     // let body_data = NowPrice::new(body_pack);
+            //     // // println!("{:?}", &body_pack_clone);
+            //     println!("{}", body_data.MsgSize);
+            //     println!("{}", body_data.MsgType);
+            //     println!("{}", body_data.SecurityCode);
+            //     println!("{}", body_data.MarketCode);
                 
+            // // }
+            // // }else if (body_head.MsgType == 53){
+            // //      println!("MsgType :{}", body_head.MsgType);
+            // //      let filler_nums = (pkt_size - 8) / 24;
+            // //      let body_data  = LevelPrice::new(body_pack,filler_nums as u8);
+            // //      println!("{}", body_data);
+                 
+            // }else if (body_head.MsgType == 62){
+            //     println!("MsgType :{}", body_head.MsgType);
+                 
+            // }else if (body_head.MsgType == 40){
+            //      println!("else MsgType :{}", body_head.MsgType);
+            // }else{
+            //     println!("error MsgType :{}", body_head.MsgType);
             // }
-            }else if (body_head.MsgType == 53){
-                 println!("MsgType :{}", body_head.MsgType);
-                 let filler_nums = (pkt_size - 8) / 24;
-                 let body_data  = LevelPrice::new(body_pack,filler_nums as u8);
-                 println!("{}", body_data);
-                 
-            }else if (body_head.MsgType == 62){
-                println!("MsgType :{}", body_head.MsgType);
-                 
-            }else if (body_head.MsgType == 40){
-                 println!("else MsgType :{}", body_head.MsgType);
-            }else{
-                println!("error MsgType :{}", body_head.MsgType);
-            }
            
-            body.clear();
+            // body.clear();
+            body = body.split_off(pkt_size as usize)
+            
         }
     }
 }
+
 
 // let head = Head::new(buff.to_vec());
 // println!( "{}", head.MsgSize);
