@@ -20,14 +20,14 @@ type A = String;
 
 trait FnBoxArgs<A>{
     type Output;
-    fn call_box(self:Box<Self>, args: A) ->A;
+    fn call_box(self:Box<Self>, args: A) ->Self::Output;
 }
 
 impl<F:FnOnce(A)> FnBoxArgs<A> for F  {
-    type Output = F::Output;
-    fn call_box(self:Box<F>, args: A)->A{
+    type Output = String;
+    fn call_box(self:Box<F>, args: A)->Self::Output{
         (*self)(args);
-        return args;
+        return String::from("/");
     }
     
 }
@@ -101,24 +101,24 @@ fn make_map() -> HashMap<i32, Box<FnBox() -> i32>> {
     map
 }
 
-pub fn test_func<T>(args:T) -> T{
+pub fn test_func(args:String) -> String{
     return args
 }
 
 pub fn test_make_rule_args(args: String) {
-    type T = String;
+    type T = (String,);
     let mut list:Vec<RuleH<Box<FnBoxArgs(A) ->T>>> = Vec::new() ;
     // let func : Vec::new(Box::new(|| 44))
     let mut rule_data = RuleH{
         rule: String::from("/"),
-        func: Box::new(|args|test_func::<T>) as Box<FnBoxArgs(A) ->T>
+        func: Box::new(|args|test_func::<T>) as Box<FnBoxArgs(A) ->(String,) >
     };
     // print!("{:?}",rule_data);
     let handler_list = make_rule_args(list, rule_data);
     for f in handler_list{
         let func:Box<FnBoxArgs(A) ->T> = f.func;
-        let nums = func.call_box(args);
-        println!("num is :{}",nums);
+        let nums = func.call_box((args,));
+        // println!("num is :{}",nums);
     }
 
 }

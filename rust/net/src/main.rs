@@ -5,7 +5,7 @@ use std::net::{TcpListener, TcpStream};
 
 use net::Pool::ThreadPool;
 use net::utils::{rule_data,rule_data_app,static_response};
-use net::func_test::test_make_map;
+use net::rule::test_make_map;
 
 pub struct Server{
     host:String,
@@ -80,8 +80,30 @@ impl Server {
         let static_path = String::from("./src/static/");
         if let Some(req) = Request::pares(&mut stream){
             // let mut static_path_clone = self.static_path.clone();
+<<<<<<< HEAD
             Self::process_request(static_path ,req, stream);
             
+=======
+            // let mut req_path_clone = req.path.clone();
+            if req.path.ends_with(".html") || req.path.ends_with(".js"){
+               
+                // let resp = static_response(static_path_clone,req_path_clone);
+                let resp = static_response(&static_path,&req.path);
+                println!("static file{}", req.path);
+                resp.send(&mut stream);
+            }
+            else if req.path == "/"{
+                let resp =rule_data(req);
+                resp.send(&mut stream);
+            }else if req.path == "/index"{
+                let resp = rule_data_app("/index", req);
+                resp.send(&mut stream);       
+            }else{
+                let content = "404";
+                let resp = Response::new(404,"text/html",content.to_string());
+                resp.send(&mut stream);
+            }
+>>>>>>> origin/master
             // resp.send(&mut stream);
         }
         else{

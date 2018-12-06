@@ -7,6 +7,12 @@ use time;
 // 包头数据
 use std::fmt;
 
+
+
+enum Message {
+Quit,
+}
+
 #[derive(Debug, Clone)]
 pub struct PackHead {
     pub PktSize: u16,
@@ -111,28 +117,26 @@ impl LevelPriceFiller {
         let mut rd_buffer = rd_buffer;
         // level_price_filler.
         for row in 0..filler {
-            level_price_filler.push(
-                LevelPriceFiller {
+            level_price_filler.push(LevelPriceFiller {
                 AggregateQuantity: rd_buffer.read_u64(),
                 Price: rd_buffer.read_i32(),
                 NumberOfOrders: rd_buffer.read_u32(),
                 PriceLevel: rd_buffer.read_u8(),
                 UpdateAction: rd_buffer.read_u8(),
-                Filler: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
+                // Filler: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
+                Filler: match String::from_utf8(rd_buffer.read_bytes(3 as usize)) {
+                    Ok(msg) => msg,
+                    Err(err) => String::new(),
+                },
             });
         }
         return level_price_filler;
     }
 }
 
-
 impl fmt::Display for LevelPriceFiller {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Price {} PriceLevel {}, ",
-            self.Price, self.PriceLevel
-        )
+        write!(f, "Price {} PriceLevel {}, ", self.Price, self.PriceLevel)
     }
 }
 
@@ -148,8 +152,8 @@ impl fmt::Display for LevelPriceFiller {
 
 #[derive(Debug, Clone)]
 pub struct LevelPrice {
-    pub MsgSize: u16,
-    pub MsgType: u16,
+    // pub MsgSize: u16,
+    // pub MsgType: u16,
     pub SecurityCode: u32,
     pub Filler: String,
     pub NoEntries: u8,
@@ -157,26 +161,43 @@ pub struct LevelPrice {
 }
 
 impl LevelPrice {
-    pub fn new(nominalprice: Vec<u8>,filler_nums:u8) -> LevelPrice {
+    pub fn new(nominalprice: Vec<u8>, filler_nums: u8) -> LevelPrice {
         let mut buffer = ByteBuffer::new();
 
         // buffer.set_endian(LittleEndian);
         for index in nominalprice {
             buffer.write_u8(index);
         }
-        LevelPrice::unpack(buffer,filler_nums)
+        LevelPrice::unpack(buffer, filler_nums)
     }
 
-    pub fn unpack(rd_buffer: ByteBuffer,filler_nums:u8) -> LevelPrice {
+    pub fn unpack(rd_buffer: ByteBuffer, filler_nums: u8) -> LevelPrice {
         let mut rd_buffer = rd_buffer;
+        // let MsgSize = rd_buffer.read_u16();
+        // let MsgType =  rd_buffer.read_u16();
+        let SecurityCode = rd_buffer.read_u32();
+        let Filler = match String::from_utf8(rd_buffer.read_bytes(3 as usize)) {
+            Ok(msg) => msg,
+            Err(err) => String::new(),
+        };
+        let NoEntries = rd_buffer.read_u8();
+
         LevelPrice {
-            MsgSize: rd_buffer.read_u16(),
-            MsgType: rd_buffer.read_u16(),
-            SecurityCode: rd_buffer.read_u32(),
-            Filler: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
-            NoEntries: rd_buffer.read_u8(),
-            FillerData: LevelPriceFiller::unpack(rd_buffer, filler_nums),
+            // MsgSize: MsgSize,
+            // MsgType: MsgType,
+            SecurityCode: SecurityCode,
+            Filler: Filler,
+            NoEntries: NoEntries,
+            FillerData: LevelPriceFiller::unpack(rd_buffer, NoEntries),
         }
+        //  LevelPrice {
+        //     MsgSize: rd_buffer.read_u16(),
+        //     MsgType: rd_buffer.read_u16(),
+        //     SecurityCode: rd_buffer.read_u32(),
+        //     Filler: String::from_utf8(rd_buffer.read_bytes(3 as usize)).unwrap(),
+        //     NoEntries: rd_buffer.read_u8(),
+        //     FillerData: LevelPriceFiller::unpack(rd_buffer, filler_nums),
+        // }
     }
 }
 
@@ -192,14 +213,14 @@ impl fmt::Display for LevelPrice {
 
         write!(
             f,
-            "MsgSize {} MsgType {}, Filler {}, SecurityCode {}, NoEntries {} filler other {}",
-            self.MsgSize,
-            self.MsgType,
+            // "MsgSize {} MsgType {},
+            "Filler {}, SecurityCode {}, NoEntries {} filler other {}",
+            // self.MsgSize,
+            // self.MsgType,
             self.Filler,
             self.SecurityCode,
             self.NoEntries,
-            self.FillerData[0]
-            // &filler_string
+            self.FillerData[0] // &filler_string
         )
     }
 }
@@ -257,8 +278,8 @@ impl CloseingPrice {
 
 #[derive(Debug, Clone)]
 pub struct NominalPrice {
-    pub MsgSize: u16,
-    pub MsgType: u16,
+    // pub MsgSize: u16,
+    // pub MsgType: u16,
     pub SecurityCode: u32,
     pub NominalPrice: i32,
 }
@@ -285,8 +306,8 @@ impl NominalPrice {
 
     pub fn pack(self) -> ByteBuffer {
         let mut wt_buffer = ByteBuffer::new();
-        wt_buffer.write_u16(self.MsgSize);
-        wt_buffer.write_u16(self.MsgType);
+        // wt_buffer.write_u16(self.MsgSize);
+        // wt_buffer.write_u16(self.MsgType);
         wt_buffer.write_u32(self.SecurityCode);
         wt_buffer.write_i32(self.NominalPrice);
         return wt_buffer;
@@ -295,8 +316,8 @@ impl NominalPrice {
     pub fn unpack(rd_buffer: ByteBuffer) -> NominalPrice {
         let mut rd_buffer = rd_buffer;
         NominalPrice {
-            MsgSize: rd_buffer.read_u16(),
-            MsgType: rd_buffer.read_u16(),
+            // MsgSize: rd_buffer.read_u16(),
+            // MsgType: rd_buffer.read_u16(),
             SecurityCode: rd_buffer.read_u32(),
             NominalPrice: rd_buffer.read_i32(),
         }

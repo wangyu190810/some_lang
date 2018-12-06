@@ -10,6 +10,7 @@ extern crate redis_client;
 extern crate serialize;
 extern crate redis;
 extern crate byteorder;
+extern crate chrono;
 
 #[macro_use]
 extern crate serde_derive;
@@ -23,8 +24,10 @@ mod packet;
 mod JsonData;
 mod RedisTest;
 mod stream_data;
-
-
+mod byte_process;
+mod byte_process_py;
+mod byte_process_client;
+mod utils;
 
 fn set_u16_le(a: &mut [u8], v: u16) -> u16 {
     print!("{:?}",a);
@@ -52,7 +55,10 @@ fn main() {
       // JsonData::str_data(data);
       // RedisTest::set_and_get();
       // RedisTest::do_something();
-      stream_data::head();
+    //   stream_data::head();
+    //   byte_process::full_package();
+    //   byte_process_py::full_package();
+      byte_process_client::full_package();
       // let mut end:u16 = 0;
       //   let mut buff = [2,5];
       //   print!("{:?}",buff);
