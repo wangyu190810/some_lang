@@ -2,10 +2,10 @@
 # -*-coding:utf-8-*-
 from flask import jsonify,request,g
 from application import app
-from utils.request_process import request_data
+from core.request_process import request_data
 from dao.Route import Route
-
-from utils.request_process import login_required
+from utils.utils import resp_msg
+from core.request_process import login_required
 
 
 
@@ -33,6 +33,31 @@ def route_list():
 def route_add():
     form_data = request_data()
     page = form_data.get("page")
-    print(page)
-    data = Route.get_route(g.db.get("test_r"))
-    return jsonify(data=data)
+    url = form_data.get("url")
+    level = form_data.get("level")
+    name = form_data.get("name")
+    data = Route.add_route(g.db.get("test_w"),url=url,level=level,name=name)
+
+    if data:
+        data = resp_msg()
+    else:
+        data =resp_msg(code="1",data="add route error")
+    return jsonify(data)
+
+
+@app.route('/route_edit', methods=['GET', 'POST'])
+@login_required
+def route_edit():
+    form_data = request_data()
+    r_id = form_data.get("r_id")
+    url = form_data.get("url")
+    level = form_data.get("level")
+    name = form_data.get("name")
+    data = Route.edit_route(g.db.get("test_w"),r_id=r_id,url=url,level=level,name=name)
+
+    if data:
+        data = resp_msg()
+    else:
+        data =resp_msg(code="1",data="edit route error")
+    return jsonify(data)
+

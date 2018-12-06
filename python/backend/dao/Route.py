@@ -56,6 +56,22 @@ class Route(Base):
             logging.error("add_route error %s" % e)
             return [], 0
 
-
-
+    @staticmethod
+    def edit_route(connection, r_id, url, level, name="", icon=""):
+        query = connection.query(Route)
+        print()
+        edit_query = query.filter_by(id=r_id).first()
+        print(edit_query)
+        try:
+            edit_query.url = url
+            edit_query.level = level
+            edit_query.name = name
+            edit_query.icon = icon
+            connection.add(edit_query)
+            connection.commit()
+            return True
+        except Exception as e:
+            logging.error(traceback.print_exc())
+            logging.error("edit_route error %s" % e)
+            return False
 
