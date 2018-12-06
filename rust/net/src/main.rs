@@ -24,6 +24,27 @@ impl Server {
         }
     }
     
+    pub fn process_request(static_path:String,req: net::query::Request,mut stream: TcpStream){
+        if req.path.ends_with(".html") || req.path.ends_with(".js"){
+               
+                // let resp = static_response(static_path_clone,req_path_clone);
+                let resp = static_response(&static_path,&req.path);
+                println!("static file{}", req.path);
+                resp.send(&mut stream);
+            } else if req.path == "/"{
+                let resp =rule_data("/", req);
+                resp.send(&mut stream);
+            }else if req.path == "/index"{
+                let resp = rule_data_app("/index", req);
+                resp.send(&mut stream);       
+            }else{
+                let content = "404";
+                let resp = Response::new(404,"text/html",content.to_string());
+                resp.send(&mut stream);
+            }
+
+    }
+        
 
     pub fn run(&self){
         // let addr = format!("{}:{}", self.host, self.port).as_str();
@@ -59,25 +80,8 @@ impl Server {
         let static_path = String::from("./src/static/");
         if let Some(req) = Request::pares(&mut stream){
             // let mut static_path_clone = self.static_path.clone();
-            // let mut req_path_clone = req.path.clone();
-            if req.path.ends_with(".html") || req.path.ends_with(".js"){
-               
-                // let resp = static_response(static_path_clone,req_path_clone);
-                let resp = static_response(&static_path,&req.path);
-                println!("static file{}", req.path);
-                resp.send(&mut stream);
-            }
-            else if req.path == "/"{
-                let resp =rule_data("/", req);
-                resp.send(&mut stream);
-            }else if req.path == "/index"{
-                let resp = rule_data_app("/index", req);
-                resp.send(&mut stream);       
-            }else{
-                let content = "404";
-                let resp = Response::new(404,"text/html",content.to_string());
-                resp.send(&mut stream);
-            }
+            Self::process_request(static_path ,req, stream);
+            
             // resp.send(&mut stream);
         }
         else{
@@ -89,7 +93,9 @@ impl Server {
    
 
     pub fn start(&self){
+        println!("net server start  addr  {}:{}", self.host,self.port);
         Self::run(self);
+        
     }
 
 }
@@ -98,7 +104,7 @@ impl Server {
 
 fn main(){
     // let  server = Server::new("0.0.0.0",5000,"/home/too/work/some_lang/rust/net/src/static/");
-    // let  server = Server::new("0.0.0.0",5000,"./src/static/");
-    // server.start();
-    test_make_map()
+    let  server = Server::new("0.0.0.0",5000,"./src/static/");
+    server.start();
+    // test_make_map()
 }
