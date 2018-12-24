@@ -14,6 +14,9 @@ import java.nio.charset.Charset;
 public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
 
     @Override
+
+
+
     public void channelActive(ChannelHandlerContext ctx){
         ctx.writeAndFlush(Unpooled.copiedBuffer("Netty rocks!",CharsetUtil.UTF_8));
     }

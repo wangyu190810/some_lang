@@ -8,21 +8,21 @@ use time;
 use std::fmt;
 use std::marker::Sized;
 
-pub trait MsgT {
-    // fn new(&self) -> f64;
-    // fn new(msg_data: Vec<u8>) -> Self;
-    fn new(msg_data: Vec<u8>) -> Self where Self: Sized {
-        let mut buffer = ByteBuffer::new();
-        for index in msg_data {
-            buffer.write_u8(index);
-        }
-        Self::unpack(buffer)
-    };
+// pub trait MsgT {
+//     // fn new(&self) -> f64;
+//     // fn new(msg_data: Vec<u8>) -> Self;
+//     fn new(msg_data: Vec<u8>) -> Self where Self: Sized {
+//         let mut buffer = ByteBuffer::new();
+//         for index in msg_data {
+//             buffer.write_u8(index);
+//         }
+//         Self::unpack(buffer)
+//     };
 
-    fn pack(self) -> ByteBuffer;
+//     fn pack(self) -> ByteBuffer;
     
-    fn unpack(rd_buffer: ByteBuffer) -> Self;
-}
+//     fn unpack(rd_buffer: ByteBuffer) -> Self;
+// }
 
 
 pub trait Msg{

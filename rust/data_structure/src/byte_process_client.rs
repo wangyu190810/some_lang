@@ -38,7 +38,7 @@ pub fn full_package() {
     static buff_status: usize = 4096;
     println!("start");
     // let mut stream = TcpStream::connect("192.168.1.11:6101").unwrap();
-    let mut stream = TcpStream::connect("218.253.82.29:6105").unwrap();
+    let mut stream = TcpStream::connect("218.253.82.29:6101").unwrap();
     // let mut stream = TcpStream::connect("127.0.0.1:5000").unwrap();
     // ignore the Result
     // let _ = stream.write(&[1])

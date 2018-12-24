@@ -28,6 +28,7 @@ public class EchoClient {
                     channel(NioSocketChannel.class).
                     remoteAddress(new InetSocketAddress(host,port)).
                     handler(new ChannelInitializer<SocketChannel>() {
+
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new EchoClientHandler());

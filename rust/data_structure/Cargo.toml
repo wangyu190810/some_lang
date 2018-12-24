@@ -11,6 +11,9 @@ serde_derive="*"
 redis-client="*"
 redis = "*"
 byteorder = "0.3"
+
+# [dependencies]
+chrono = "0.4"
 # bytebuffer = "*"
 
 bytebuffer = {git="https://github.com/wangyu190810/rust-bytebuffer",branch = "master"}
