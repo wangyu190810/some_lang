@@ -1,14 +1,10 @@
 #![allow(unused)]
 #![feature(fnbox)]
-
+#![feature(unboxed_closures)]
+#![feature(fn_traits)]
 use std::boxed::FnBox;
 use std::collections::HashMap;
 
-pub trait FnBox<A> {
-    type Output;
-
-    fn call_box(self: Box<Self>, args: A) -> Self::Output;
-}
 
 pub struct FnBoxData{
     list:Vec<i8>
@@ -16,21 +12,15 @@ pub struct FnBoxData{
 
 
 
-impl<i8, FnBoxData> FnBox<i8> for FnBoxData
-    where F: FnOnce<i8>
-{
-    type Output = FnBoxData::Output;
+// impl<i8, FnBoxData> FnBox<i8> for FnBoxData
+//     where FnBoxData: FnOnce<i8>
+// {
+//     type Output = FnBoxData::Output;
 
-    fn call_box(self: Box<FnBoxData>, args: i8) -> FnBoxData::Output {
-        self.call_once(args)
-    }
-}
-
-
-
-
-
-
+//     fn call_box(self: Box<FnBoxData>, args: i8) -> FnBoxData::Output {
+//         self.call_once(args)
+//     }
+// }
 
 
 fn make_map() -> HashMap<i32, Box<FnBox() -> i32>> {
